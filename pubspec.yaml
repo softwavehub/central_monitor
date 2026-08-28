@@ -1,0 +1,21 @@
+name: central_monitor
+description: Lightweight client SDK for Central App Monitor - reports customer/device/permission data and applies remote enable/disable control.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  shared_preferences: ^2.2.0
+  package_info_plus: ^8.0.0
+  device_info_plus: ^10.1.0
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
