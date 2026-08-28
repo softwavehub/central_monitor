@@ -1,7 +1,8 @@
-import 'dart:io';
+import 'dart:ui' show PlatformDispatcher;
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
+import 'platform_device_info.dart';
 
 /// Lightweight, legitimately-available device/app metadata.
 /// No identifiers, no contacts/SMS/location - see doc.md #22.
@@ -19,7 +20,7 @@ class DeviceSnapshot {
   });
 
   final String packageName;
-  final String platform; // 'android' | 'ios'
+  final String platform; // android | ios | web | macos | windows | linux | other
   final String appVersion;
   final String buildNumber;
   final String? osVersion;
@@ -30,47 +31,18 @@ class DeviceSnapshot {
 
   static Future<DeviceSnapshot> collect() async {
     final packageInfo = await PackageInfo.fromPlatform();
-    final deviceInfo = DeviceInfoPlugin();
-    final locale = Platform.localeName;
-    final timezone = DateTime.now().timeZoneName;
-
-    if (Platform.isAndroid) {
-      final info = await deviceInfo.androidInfo;
-      return DeviceSnapshot(
-        packageName: packageInfo.packageName,
-        platform: 'android',
-        appVersion: packageInfo.version,
-        buildNumber: packageInfo.buildNumber,
-        osVersion: info.version.release,
-        manufacturer: info.manufacturer,
-        model: info.model,
-        locale: locale,
-        timezone: timezone,
-      );
-    }
-
-    if (Platform.isIOS) {
-      final info = await deviceInfo.iosInfo;
-      return DeviceSnapshot(
-        packageName: packageInfo.packageName,
-        platform: 'ios',
-        appVersion: packageInfo.version,
-        buildNumber: packageInfo.buildNumber,
-        osVersion: info.systemVersion,
-        manufacturer: 'Apple',
-        model: info.utsname.machine,
-        locale: locale,
-        timezone: timezone,
-      );
-    }
+    final platformInfo = await collectPlatformDeviceInfo();
 
     return DeviceSnapshot(
       packageName: packageInfo.packageName,
-      platform: 'other',
+      platform: platformInfo.platform,
       appVersion: packageInfo.version,
       buildNumber: packageInfo.buildNumber,
-      locale: locale,
-      timezone: timezone,
+      osVersion: platformInfo.osVersion,
+      manufacturer: platformInfo.manufacturer,
+      model: platformInfo.model,
+      locale: PlatformDispatcher.instance.locale.toString(),
+      timezone: DateTime.now().timeZoneName,
     );
   }
 
